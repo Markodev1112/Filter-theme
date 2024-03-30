@@ -32,9 +32,7 @@
   {% endif %}
 
   {% if cart.item_count > 0 %}
-   
   <form action="{{ routes.cart_url }}" method="post" id="cartform" data-cc-animate>
-
     <ul class="cart-list clearfix">
       <li class="item cart-delete">
         <div class="delete-button">
@@ -217,7 +215,7 @@
                           {% if item.product.metafields.my_fields.antal_plattor_per_kvm %}
                             {% unless item.product.tags contains 'Kantsten' or item.product.tags contains 'Stolpar' or item.product.tags contains 'Trappor' %}
                               <div class="item-quantity ratio">  
-                                <label class="kvm calculated-input-label" for="ratio"><span>KVM</span></label>
+                                <label class="kvm calculated-input-label" for="ratio"><span style="text-transform: lowercase; font-size: 14px;">m²</span></label>
                                 <div class="jc-cart quantity border-radius-{{ settings.buttons_shape }}">
                                   <a
                                     class="minus" data-quantity="down"
@@ -248,8 +246,8 @@
     
                             {% comment %} input for small stons {% endcomment %}
                             <div class="item-quantity pro weight">
-                              {% comment %} input for Stycken {% endcomment %}
-                              <label class="pc calculated-input-label" for="quantity"><span>STYCKEN</span></label>
+                              {% comment %} input for ANTAL {% endcomment %}
+                              <label class="pc calculated-input-label" for="quantity"><span>ANTAL</span></label>
                               <div class="jc-cart quantity border-radius-{{ settings.buttons_shape }}">
                                 <a
                                   class="minus"
@@ -310,7 +308,7 @@
                           {% elsif item.product.metafields.custom.antal_kvm_per_sack %}
                             {% unless item.product.tags contains 'Kantsten' or item.product.tags contains 'Stolpar' or item.product.tags contains 'Trappor' %}
                               <div class="item-quantity ratio">  
-                                <label class="kvm calculated-input-label" for="ratio"><span>KVM</span></label>
+                                <label class="kvm calculated-input-label" for="ratio"><span style="text-transform: lowercase; font-size: 14px;">m²</span></label>
                                 <div class="jc-cart quantity border-radius-{{ settings.buttons_shape }}">
                                   <a
                                     class="minus"
@@ -339,7 +337,7 @@
                             {% endunless %} 
 
                             <div class="item-quantity weight bags">
-                              {% comment %} input for Stycken {% endcomment %}
+                              {% comment %} input for ANTAL {% endcomment %}
                               <label class="calculated-input-label" for="quantity"><span>SÄCKAR</span></label>
                               <div class="jc-cart quantity border-radius-{{ settings.buttons_shape }}">
                                 <a
@@ -368,8 +366,8 @@
                             </div>
                           {% else %}
                             <div class="item-quantity weight">
-                              {% comment %} input for Stycken {% endcomment %}
-                              <label class="pc calculated-input-label" for="quantity"><span>STYCKEN</span></label>
+                              {% comment %} input for ANTAL {% endcomment %}
+                              <label class="pc calculated-input-label" for="quantity"><span>ANTAL</span></label>
                               <div class="jc-cart quantity border-radius-{{ settings.buttons_shape }}">
                                 <a
                                   class="minus"

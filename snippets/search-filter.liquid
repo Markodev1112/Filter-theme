@@ -76,7 +76,7 @@
 {% endcapture %}
 
 {% if section.settings.filter_mode == "simple" or section.settings.filter_mode == "none" %}
-  <div class="wide-container filter{% if mode == "collection" and section.settings.show_collection_image == false and section.settings.show_collection_content == false %} mt-0{% endif %}"
+  <div class="a wide-container filter{% if mode == "collection" and section.settings.show_collection_image == false and section.settings.show_collection_content == false %} mt-0{% endif %}"
        data-cc-animate data-cc-animate-delay="0.7s">
 
     <form id="FacetsForm" data-ajax-container>
@@ -161,94 +161,99 @@
       <div class="cc-product-filter cc-product-filter--sticky-{{ section.settings.sticky_sidebar }} {% if section.settings.sticky_sidebar %}cc-sticky-scroll-direction{% endif %}"
            {% if section.settings.sticky_sidebar %}data-cc-sticky-scroll-top{% endif %}>
         <form id="FacetsForm">
+          
           {%- for filter in results.filters -%}
-            {%- liquid
-              if settings.swatch_enabled and settings.swatch_option_name == filter.label and filter.type == "list"
-                assign filter_group_is_swatch = true
-              else
-                assign filter_group_is_swatch = false
-              endif
-
-              if section.settings.collapse_filters_method == 'all'
-                assign filter_is_open = false
-              elsif section.settings.collapse_filters_method == 'none'
-                assign filter_is_open = true
-              elsif section.settings.collapse_filters_method contains 'over-'
-                assign limit = section.settings.collapse_filters_method | split: '-' | last | plus: 0
-                if filter.values.size > limit
-                  assign filter_is_open = false
+              {%- liquid
+                if settings.swatch_enabled and settings.swatch_option_name == filter.label and filter.type == "list"
+                  assign filter_group_is_swatch = true
                 else
-                  assign filter_is_open = true
+                  assign filter_group_is_swatch = false
                 endif
-              endif
 
-              assign filter_title = filter.label | escape
-              assign num_available_options = 0
-            -%}
+                if section.settings.collapse_filters_method == 'all'
+                  assign filter_is_open = false
+                elsif section.settings.collapse_filters_method == 'none'
+                  assign filter_is_open = true
+                elsif section.settings.collapse_filters_method contains 'over-'
+                  assign limit = section.settings.collapse_filters_method | split: '-' | last | plus: 0
+                  if filter.values.size > limit
+                    assign filter_is_open = false
+                  else
+                    assign filter_is_open = true
+                  endif
+                endif
 
-            {%- capture filter_content -%}
-              {%- case filter.type -%}
-                {%- when "list" -%}
-                  {%- if filter_group_is_swatch -%}
-                    <ul class="cc-swatches">
+                assign filter_title = filter.label | escape
+                assign num_available_options = 0
+              -%}
+
+              {%- capture filter_content -%}
+                {%- case filter.type -%}
+                  {%- when "list" -%}
+                    <script>console.log({{ filter.type | json }})</script>
+
+                    {%- if filter_group_is_swatch -%}
+                      <ul class="cc-swatches">
+                        {%- for value in filter.values -%}
+                          {%- if value.count > 0 or section.settings.show_filter_deadends %}
+                            {%- assign num_available_options = num_available_options | plus: 1 -%}
+                            <li data-tag="{{ value.label | handle }}">
+                              <label class="cc-checkbox{% if value.active %} active{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %}"
+                                    title="{{ value.label | escape }}">
+                                <input class="cc-checkbox__input"
+                                      id="Filter-{{ value.param_name }}-{{ value.value | handle }}"
+                                      type="checkbox"
+                                      name="{{ value.param_name }}"
+                                      value="{{ value.value | escape }}"
+                                      {% if value.active %}checked{% endif %}
+                                  {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                              </label>
+                              {% if settings.swatch_method == "image" %}
+                                {% style %}
+                                  .cc-swatches [data-tag="{{ value.label | handle }}"] .cc-checkbox::before {
+                                  background-image: url({{ value.label | handle | append: '.png' | file_img_url: '48x48', crop: 'center' }});
+                                  }
+                                {% endstyle %}
+                              {% endif %}
+                            </li>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </ul>
+                    {%- else -%}
                       {%- for value in filter.values -%}
                         {%- if value.count > 0 or section.settings.show_filter_deadends %}
                           {%- assign num_available_options = num_available_options | plus: 1 -%}
-                          <li data-tag="{{ value.label | handle }}">
-                            <label class="cc-checkbox{% if value.active %} active{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %}"
-                                   title="{{ value.label | escape }}">
-                              <input class="cc-checkbox__input"
-                                     id="Filter-{{ value.param_name }}-{{ value.value | handle }}"
-                                     type="checkbox"
-                                     name="{{ value.param_name }}"
-                                     value="{{ value.value | escape }}"
-                                     {% if value.active %}checked{% endif %}
-                                {% if value.count == 0 and value.active == false %}disabled{% endif %}>
-                            </label>
-                            {% if settings.swatch_method == "image" %}
-                              {% style %}
-                                .cc-swatches [data-tag="{{ value.label | handle }}"] .cc-checkbox::before {
-                                background-image: url({{ value.label | handle | append: '.png' | file_img_url: '48x48', crop: 'center' }});
-                                }
-                              {% endstyle %}
+                          <label class="cc-checkbox">
+                            <input class="cc-checkbox__input"
+                                  id="Filter-{{ value.param_name }}-{{ value.value | handle }}"
+                                  type="checkbox"
+                                  name="{{ value.param_name }}"
+                                  value="{{ value.value | escape }}"
+                                  {% if value.active %}checked{% endif %}
+                              {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+
+                            <span class="cc-checkbox__label">{{ value.label | escape}}</span>
+
+                            {% if section.settings.show_filter_counts %}
+                              <span class="cc-checkbox__count">{{ value.count }}</span>
                             {% endif %}
-                          </li>
+                          </label>
                         {%- endif -%}
                       {%- endfor -%}
-                    </ul>
-                  {%- else -%}
-                    {%- for value in filter.values -%}
-                      {%- if value.count > 0 or section.settings.show_filter_deadends %}
-                        {%- assign num_available_options = num_available_options | plus: 1 -%}
-                        <label class="cc-checkbox">
-                          <input class="cc-checkbox__input"
-                                 id="Filter-{{ value.param_name }}-{{ value.value | handle }}"
-                                 type="checkbox"
-                                 name="{{ value.param_name }}"
-                                 value="{{ value.value | escape }}"
-                                 {% if value.active %}checked{% endif %}
-                            {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                    {%- endif -%}
 
-                          <span class="cc-checkbox__label">{{ value.label | escape }}</span>
+                  {%- when "price_range" -%}
+                    {%- assign num_available_options = 1 -%}
+                    <script>console.log({{ filter.type | json }})</script>
+                    {% render 'price-range', filter: filter %}
 
-                          {% if section.settings.show_filter_counts %}
-                            <span class="cc-checkbox__count">{{ value.count }}</span>
-                          {% endif %}
-                        </label>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- endif -%}
+                {%- endcase -%}
+              {%- endcapture -%}
 
-                {%- when "price_range" -%}
-                  {%- assign num_available_options = 1 -%}
-                  {% render 'price-range', filter: filter %}
+              {%- if num_available_options > 0 or section.settings.show_filter_deadends -%}
+                {%- render "accordion", first_item_open: filter_is_open, item1_title: filter_title, item1_content: filter_content -%}
+              {%- endif -%}
 
-              {%- endcase -%}
-            {%- endcapture -%}
-
-            {%- if num_available_options > 0 or section.settings.show_filter_deadends -%}
-              {%- render "accordion", first_item_open: filter_is_open, item1_title: filter_title, item1_content: filter_content -%}
-            {%- endif -%}
           {%- endfor -%}
 
           {%- if section.settings.enable_sorting -%}
@@ -261,9 +266,8 @@
                 assign filter_is_open = true
               endif
             -%}
-
             {%- capture filter_content -%}
-              <ul class="cc-product-filter__sort-by">
+              {% comment %} <ul class="cc-product-filter__sort-by">
                 {%- for option in results.sort_options -%}
                   {%- if option.value == "manual" and section.settings.show_featured_in_sort -%}
                     <label class="cc-checkbox sort-{{ option.name | handle }}">
@@ -287,10 +291,29 @@
                     </label>
                   {%- endif -%}
                 {%- endfor -%}
-              </ul>
+              </ul>     {% endcomment %}
             {%- endcapture -%}
 
-            {%- render "accordion", first_item_open: filter_is_open, item1_title: filter_title, item1_content: filter_content -%}
+            {% comment %} {%- render "accordion", first_item_open: filter_is_open, item1_title: filter_title, item1_content: filter_content -%} {% endcomment %}
+           
+            <div class="custom-sort">
+              <div class="option">
+                <label for="filter-by-sort-by">{{ translation_sort_title }}</label>
+                <select id="filter-by-sort-by" name="sort_by">
+                  {%- for option in results.sort_options -%}
+                    {%- if option.value == "manual" and section.settings.show_featured_in_sort -%}
+                      <option value="{{ option.value | escape }}"{% if option.value == sort_by or option.value == current_sort_by %} selected="selected"{% endif %}>
+                        {{ option.name | escape }}
+                      </option>
+                    {%- elsif option.value != "manual" -%}
+                      <option value="{{ option.value | escape }}"{% if option.value == sort_by or option.value == current_sort_by %} selected="selected"{% endif %}>
+                        {{ option.name | escape }}
+                      </option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </select>
+              </div>
+            </div>
           {% endif %}
 
           {{ form_hidden_fields }}
@@ -302,45 +325,44 @@
       </div>
     {% endif %}
 
-    <div class="product-list-container{% if section.settings.filter_mode == "sidebar" and show_filters == true %} product-list-container--with-sidebar{% endif %}" data-infinite-scroll-container>
-
-      {% capture active_filters_html %}
+    <div class="custom-product-filter-list product-list-container{% if section.settings.filter_mode == "sidebar" and show_filters == true %} product-list-container--with-sidebar{% endif %}" data-infinite-scroll-container>
+        {% capture active_filters_html %}
         <div class="active-filter-controls-container">
-          <ul class="active-filter-controls">
-            <li class="active-filter-controls__clear-left">
-              <a href="{{ results_url }}" class="active-filter-controls__clear">
-                {{ translation_clear_all }}
-              </a>
-            </li>
+            <ul class="active-filter-controls">
+              <li class="active-filter-controls__clear-left">
+                <a href="{{ results_url }}" class="active-filter-controls__clear">
+                  {{ translation_clear_all }}
+                </a>
+              </li>
 
-            {%- for filter in results.filters -%}
-              {%- for value in filter.active_values -%}
-                <li>
-                  <a href="{{ value.url_to_remove }}" class="active-filter-controls__tag" data-active-tag="{{ value | escape }}">
-                    {{ value.label | escape }}
-                  </a>
-                </li>
-              {%- endfor -%}
-
-              {% if filter.type == "price_range" %}
-                {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+              {%- for filter in results.filters -%}
+                {%- for value in filter.active_values -%}
                   <li>
-                    <a href="{{ filter.url_to_remove }}" class="active-filter-controls__tag" data-active-tag="{{ filter | escape }}">
-                      {%-if filter.min_value.value %}{%- render "price", price: filter.min_value.value -%}{%- else -%}{%- render "price", price: 0 -%}{%- endif -%}&nbsp;-&nbsp;{%- if filter.max_value.value -%}{%- render "price", price: filter.max_value.value -%}{%- else -%}{%- render "price", price: filter.range_max -%}{% endif %}
+                    <a href="{{ value.url_to_remove }}" class="active-filter-controls__tag" data-active-tag="{{ value | escape }}">
+                      {{ value.label | escape }}
                     </a>
                   </li>
-                {%- endif -%}
-              {% endif %}
-            {%- endfor -%}
+                {%- endfor -%}
 
-            <li class="active-filter-controls__clear-right">
-              <a href="{{ results_url }}" class="active-filter-controls__clear">
-                {{ translation_clear_all }}
-              </a>
-            </li>
-          </ul>
+                {% if filter.type == "price_range" %}
+                  {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                    <li>
+                      <a href="{{ filter.url_to_remove }}" class="active-filter-controls__tag" data-active-tag="{{ filter | escape }}">
+                        {%-if filter.min_value.value %}{%- render "price", price: filter.min_value.value -%}{%- else -%}{%- render "price", price: 0 -%}{%- endif -%}&nbsp;-&nbsp;{%- if filter.max_value.value -%}{%- render "price", price: filter.max_value.value -%}{%- else -%}{%- render "price", price: filter.range_max -%}{% endif %}
+                      </a>
+                    </li>
+                  {%- endif -%}
+                {% endif %}
+              {%- endfor -%}
+
+              <li class="active-filter-controls__clear-right">
+                <a href="{{ results_url }}" class="active-filter-controls__clear">
+                  {{ translation_clear_all }}
+                </a>
+              </li>
+            </ul>
         </div>
-      {% endcapture %}
+        {% endcapture %}
       {%- if active_filters_html contains 'active-filter-controls__tag' -%}
         {{ active_filters_html }}
       {%- endif -%}

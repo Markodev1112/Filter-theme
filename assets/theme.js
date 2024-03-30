@@ -7405,7 +7405,9 @@ function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Obj
         console.log(ratio_unit, "ratio_unit");
         let adj = $input.data('quantity') == 'up' ? Number(ratio_unit) : -Number(ratio_unit);
         let $ratio_qty = $input.closest('.ratio-wrapper').find('input');
-        $ratio_qty.val(Number($ratio_qty.val()) + adj);
+        let ratioVal = Number($ratio_qty.val()) + adj;
+        let ratioValue = Math.max(0, ratioVal.toFixed(2));
+        $ratio_qty.val(ratioValue);
         let pc = Math.ceil($ratio_qty.val()/ratio_unit);
         let pc_quantity = $(this).closest('.product-detail__form__options--with-calculated-quantity').find('[name="quantity"]');
         pc_quantity.val(pc); 
@@ -7785,20 +7787,12 @@ if (document.querySelector('.search-btn')) {
     // e.preventDefault();
     setTimeout(() => {
      document.querySelectorAll('.product-block').forEach(item => {
-        if (item.getAttribute('data-product-show') == "search") {
-          item.style.display = "none";
-        }
-        
-      })
-  }, "1000");
-  })
-  setTimeout(() => {
-     document.querySelectorAll('.product-block').forEach(item => {
-        if (item.getAttribute('data-product-show') == "search") {
+        if (item.getAttribute('data-product-show') == "true") {
           item.style.display = "none";
         }        
       })
   }, "1000");
+  })
 }
 
 

@@ -410,6 +410,7 @@ function changeItem(_this) {
 
 
     } else {
+        console.log("here");
         var nomalProductId = _this[0].id.split('_')[1];
         var productNum = _this.val();
         var productPrice = _this[0].getAttribute('data-price');
@@ -417,7 +418,21 @@ function changeItem(_this) {
         var presentPriceWrapper = _this.closest('.item').find('.line-total .money');
         var presentPrice = presentPriceWrapper.text();
         var bagsSquare = _this[0].getAttribute('data-consequent');
-        
+
+        if (dataType == "product") {
+            ratio.val(Math.max(0, parseFloat(parseInt($cartpc) / parseFloat(consequent)).toFixed(2)));
+            ratioValue = Math.max(0, parseFloat(parseInt($cartpc) / parseFloat(consequent)).toFixed(2));
+        }
+        if (dataType == "ratio") {
+            ratioValue = Number(_this.val());
+            productValue = Math.ceil(ratioValue / ratioUnit);
+            ratio.val(ratioValue.toFixed(2));
+            if (ratioValue.toFixed(2) == 0) {
+                ratio.val(0);
+            }
+            product.val(productValue);
+        }
+
         if (_this[0].getAttribute('data-type') == "bags") {
             var bagsValue = productNum / Number(bagsSquare);
             bags.val(Math.ceil(bagsValue));

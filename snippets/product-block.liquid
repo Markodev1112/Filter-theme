@@ -57,7 +57,10 @@
   {% if mp4_url != blank %}product-block--video{% endif %}
   {% if product_has_swatches %}product-block--has-swatches{% endif %}
   {{ product_class }}"
-     data-loop-index="{{ i }}"     
+     data-loop-index="{{ i }}"  
+     {% if product.metafields.custom.no_search == true %}
+        data-product-show = "{{ product.metafields.custom.no_search }}"
+     {% endif %}
   {% if animate %} data-cc-animate="{{ animation_type }}" data-cc-animate-delay="{{ animate | times: 0.15 }}s" {% endif %}
 
   {% if product.images.size > 1 %}

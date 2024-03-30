@@ -43,8 +43,8 @@
         "894098fc-32c4-4f76-b08d-eda8f3a896d5": {
           "type": "calculated_quantity",
           "settings": {
-            "quantity_label": "Stycken",
-            "antecedent_label": "Kvm",
+            "quantity_label": "Antal",
+            "antecedent_label": "m²",
             "consequent": "{{ product.metafields.custom.antal_kvm_per_sack.value }}{{ product.metafields.my_fields.antal_plattor_per_kvm.value }}",
             "show_labels": true,
             "show_tax_and_shipping": true
